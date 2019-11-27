@@ -1,0 +1,20 @@
+{
+    "name": "treat-email/client",
+    "description": "Http client to send requests and validate emails from subscription, sign up forms",
+    "license": "MIT",
+    "keywords": ["treat.email", "http", "client", "email", "validation"],
+    "authors": [
+        {
+            "name": "treat.email",
+            "email": "treat@treat.email"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "TreatEmail\\": "src"
+        }
+    },
+    "require": {
+        "php": "^7.1"
+    }
+}
