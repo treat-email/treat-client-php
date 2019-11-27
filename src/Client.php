@@ -2,6 +2,8 @@
 
 namespace TreatEmail;
 
+use Exception;
+use RuntimeException;
 use function in_array;
 
 final class Client
@@ -68,12 +70,11 @@ final class Client
 
     /**
      * @return string
-     * @throws Exception
      */
     public function getMessage(): string
     {
         if ($this->hasMessage() === false) {
-            throw new Exception('No message to return');
+            throw new RuntimeException('No message to return');
         }
 
         return $this->response['message'];
