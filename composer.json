@@ -1,12 +1,12 @@
 {
-    "name": "treat-email/client",
+    "name": "treat-email/treat-client-php",
     "description": "Http client to send requests and validate emails from subscription, sign up forms",
     "license": "MIT",
     "keywords": ["treat.email", "http", "client", "email", "validation"],
     "authors": [
         {
             "name": "treat.email",
-            "email": "treat@treat.email"
+            "email": "admin@treat.email"
         }
     ],
     "autoload": {

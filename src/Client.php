@@ -2,18 +2,15 @@
 
 namespace TreatEmail;
 
-use Exception;
-use RuntimeException;
 use function in_array;
 
 final class Client
 {
-    private const API_URL = 'https://api.treat.email/%s/%s/%s';
+    private const API_URL = 'https://testapi.treat.email/%s/%s/%s';
     private const CONTENT_TYPE = 'Content-Type: application/json';
     private $clientKey;
     private $clientSecret;
     private $responseHeaders = [];
-    private $response = [];
     private $timeout = 3;
 
     public function __construct(string $clientKey, string $clientSecret)
@@ -29,24 +26,27 @@ final class Client
         return $this;
     }
 
-    public function validate(string $email): Client
+    /**
+     * @param string $email
+     * @return Response
+     * @throws HttpResponseNotOk
+     */
+    public function validate(string $email): Response
     {
-        $this->send($email, 'validate');
-
-        return $this;
+        return $this->send($email, 'validate');
     }
 
     /**
      * @param string $email
-     * @return Client
-     * @throws NotImplemented
+     * @return Response
+     * @throws NotImplementedMethod
      */
-    public function verify(string $email): Client
+    public function verify(string $email): Response
     {
-        throw new NotImplemented('not implemented');
+        throw new NotImplementedMethod();
     }
 
-    public function hasErrors(): bool
+    private function hasErrors(): bool
     {
         return isset($this->responseHeaders[0]) === false
             || in_array(
@@ -57,38 +57,14 @@ final class Client
             || strpos($this->responseHeaders[0], '200 OK') === false;
     }
 
-    public function isRegistrable(): bool
-    {
-        return isset($this->response['is_registrable'])
-            && $this->response['is_registrable'] === true;
-    }
-
-    public function hasMessage(): bool
-    {
-        return isset($this->response['message']) === true;
-    }
-
     /**
-     * @return string
+     * @param string $email
+     * @param string $method
+     * @return Response
+     * @throws HttpResponseNotOk
      */
-    public function getMessage(): string
+    private function send(string $email, string $method): Response
     {
-        if ($this->hasMessage() === false) {
-            throw new RuntimeException('No message to return');
-        }
-
-        return $this->response['message'];
-    }
-
-    private function resetState(): void
-    {
-        $this->response = [];
-        $this->responseHeaders = [];
-    }
-
-    private function send(string $email, string $method): void
-    {
-        $this->resetState();
         $sign = hash_hmac('sha256', $email, $this->clientSecret);
         $options = [
             'http' => [
@@ -100,12 +76,13 @@ final class Client
         ];
         $context = stream_context_create($options);
         $url = sprintf(self::API_URL, $method, $this->clientKey, $email);
-        try {
-            $jsonResponse = file_get_contents($url, false, $context);
-            $this->response = json_decode($jsonResponse, true);
-            $this->responseHeaders = $http_response_header;
-        } catch (Exception $exception) {
-            $this->responseHeaders = $http_response_header;
+        $jsonResponse = file_get_contents($url, false, $context);
+        $this->responseHeaders = $http_response_header;
+
+        if ($this->hasErrors() === true) {
+            throw new HttpResponseNotOk();
         }
+
+        return new Response(json_decode($jsonResponse, true));
     }
 }
