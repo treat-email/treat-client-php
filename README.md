@@ -24,14 +24,18 @@ $clientSecret = 'XXXXX';
 $email = 'admin@treat.email';
 
 $client = new \TreatEmail\Client($clientKey, $clientSecret);
-$response = $client->validate($email);
-if ($response->isRegistrable() === true) {
-    // email is registrable
-}
-if ($response->isRegistrable() === false) {
-    // email is not registrable
-    // and you can get violation message
-    $violation = $response->getMessage();
+try {
+    $response = $client->validate($email);
+    if ($response->isRegistrable() === true) {
+        // email is registrable
+    }
+    if ($response->isRegistrable() === false) {
+        // email is not registrable
+        // and you can get violation message
+        $violation = $response->getMessage();
+    }
+} catch (\TreatEmail\HttpResponseNotOk $exception) {
+    // in this case use internal validation to check an email
 }
 ```
 
