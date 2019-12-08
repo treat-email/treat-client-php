@@ -6,7 +6,7 @@ use function in_array;
 
 final class Client
 {
-    private const API_URL = 'https://testapi.treat.email/%s/%s/%s';
+    private const API_URL = 'https://api.treat.email/%s/%s/%s';
     private const CONTENT_TYPE = 'Content-Type: application/json';
     private $clientKey;
     private $clientSecret;
@@ -76,7 +76,7 @@ final class Client
         ];
         $context = stream_context_create($options);
         $url = sprintf(self::API_URL, $method, $this->clientKey, $email);
-        $jsonResponse = file_get_contents($url, false, $context);
+        $jsonResponse = @file_get_contents($url, false, $context);
         $this->responseHeaders = $http_response_header;
 
         if ($this->hasErrors() === true) {
