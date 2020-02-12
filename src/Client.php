@@ -9,7 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 
 final class Client
 {
-    private const API_URL_TEMPLATE = 'https://testapi.treat.email/validate/%s/%s';
+    private const API_URL_TEMPLATE = 'https://api.treat.email/validate/%s/%s';
 
     /**
      * @var ClientInterface
