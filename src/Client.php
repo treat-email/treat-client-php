@@ -59,6 +59,7 @@ final class Client
 
     /**
      * @param string $email
+     *
      * @return ResponseInterface
      *
      * @throws ClientExceptionInterface
