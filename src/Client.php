@@ -2,24 +2,56 @@
 
 namespace TreatEmail;
 
-use function in_array;
+use App\Service\TostHttpClient;
+use http\Env\Response;
+use Nyholm\Psr7\Request;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\ResponseInterface;
 
 final class Client
 {
-    private const API_URL = 'https://api.treat.email/%s/%s/%s';
-    private const CONTENT_TYPE = 'Content-Type: application/json';
-    private $clientKey;
-    private $clientSecret;
-    private $responseHeaders = [];
-    private $timeout = 3;
+    private const API_URL_TEMPLATE = 'https://testapi.treat.email/validate/%s/%s';
 
-    public function __construct(string $clientKey, string $clientSecret)
+    /**
+     * @var ClientInterface
+     */
+    private $client;
+
+    /**
+     * @var string
+     */
+    private $clientKey;
+
+    /**
+     * @var string
+     */
+    private $clientSecret;
+
+    /**
+     * @var int
+     */
+    private $timeout;
+
+    /**
+     * Constructor.
+     * @param ClientInterface $client
+     * @param string $clientKey
+     * @param string $clientSecret
+     */
+    public function __construct(ClientInterface $client, string $clientKey, string $clientSecret)
     {
+        $this->client = $client;
         $this->clientKey = $clientKey;
         $this->clientSecret = $clientSecret;
     }
 
-    public function setTimeout(int $timeout): Client
+    /**
+     * @param int $timeout
+     *
+     * @return TostHttpClient
+     */
+    public function setTimeout(int $timeout): TostHttpClient
     {
         $this->timeout = $timeout;
 
@@ -28,61 +60,32 @@ final class Client
 
     /**
      * @param string $email
-     * @return Response
-     * @throws HttpResponseNotOk
+     * @return ResponseInterface
+     *
+     * @throws ClientExceptionInterface
      */
-    public function validate(string $email): Response
+    public function validate(string $email): ResponseInterface
     {
-        return $this->send($email, 'validate');
-    }
-
-    /**
-     * @param string $email
-     * @return Response
-     * @throws NotImplementedMethod
-     */
-    public function verify(string $email): Response
-    {
-        throw new NotImplementedMethod();
-    }
-
-    private function hasErrors(): bool
-    {
-        return isset($this->responseHeaders[0]) === false
-            || in_array(
-                self::CONTENT_TYPE,
-                $this->responseHeaders,
-                true
-            ) === false
-            || strpos($this->responseHeaders[0], '200 OK') === false;
-    }
-
-    /**
-     * @param string $email
-     * @param string $method
-     * @return Response
-     * @throws HttpResponseNotOk
-     */
-    private function send(string $email, string $method): Response
-    {
-        $sign = hash_hmac('sha256', $email, $this->clientSecret);
-        $options = [
-            'http' => [
-                'timeout' => $this->timeout,
-                'method' => 'GET',
-                'header' => sprintf("Sign: %s\r\n", $sign).
-                    "User-Agent: Treat-Client\r\n",
-            ],
+        $headers = [
+            'User-Agent' => 'Treat-Client',
+            'Content-Type' => 'application/json',
+            'Sign' => $this->generateSign($email),
+            'timeout' => $this->timeout,
         ];
-        $context = stream_context_create($options);
-        $url = sprintf(self::API_URL, $method, $this->clientKey, $email);
-        $jsonResponse = @file_get_contents($url, false, $context);
-        $this->responseHeaders = $http_response_header;
 
-        if ($this->hasErrors() === true) {
-            throw new HttpResponseNotOk();
-        }
+        $url = \sprintf(self::API_URL_TEMPLATE, $this->clientKey, $email);
+        $request = new Request('GET', $url, $headers);
 
-        return new Response(json_decode($jsonResponse, true));
+        return $this->client->sendRequest($request);
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return string
+     */
+    private function generateSign(string $email): string
+    {
+        return \hash_hmac('sha256', $email, $this->clientSecret);
     }
 }
