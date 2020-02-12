@@ -17,6 +17,7 @@
     "require": {
         "php": "^7.1",
         "ext-json": "*",
+        "psr/http-client": "^1.0",
         "nyholm/psr7": "^1.2"
     }
 }
