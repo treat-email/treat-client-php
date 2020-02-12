@@ -69,7 +69,6 @@ final class Client
             'User-Agent' => 'Treat-Client',
             'Content-Type' => 'application/json',
             'Sign' => $this->generateSign($email),
-            'timeout' => $this->timeout,
         ];
 
         $url = \sprintf(self::API_URL_TEMPLATE, $this->clientKey, $email);
