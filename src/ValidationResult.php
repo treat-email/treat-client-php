@@ -24,6 +24,7 @@ final class ValidationResult
     {
         $this->checkResponseCode($response);
 
+        $response->getBody()->rewind();
         $json = $response->getBody()->getContents();
         $validationResult = \json_decode($json, true);
         if (\json_last_error() !== JSON_ERROR_NONE) {
@@ -44,6 +45,7 @@ final class ValidationResult
     {
         $this->checkResponseCode($response);
 
+        $response->getBody()->rewind();
         $json = $response->getBody()->getContents();
         $validationResult = \json_decode($json, true);
         if (\json_last_error() !== JSON_ERROR_NONE) {
