@@ -27,10 +27,6 @@ final class Client
      */
     private $clientSecret;
 
-    /**
-     * @var int
-     */
-    private $timeout;
 
     /**
      * Constructor.
@@ -43,18 +39,6 @@ final class Client
         $this->client = $client;
         $this->clientKey = $clientKey;
         $this->clientSecret = $clientSecret;
-    }
-
-    /**
-     * @param int $timeout
-     *
-     * @return TostHttpClient
-     */
-    public function setTimeout(int $timeout): TostHttpClient
-    {
-        $this->timeout = $timeout;
-
-        return $this;
     }
 
     /**
