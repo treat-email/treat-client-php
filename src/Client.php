@@ -2,7 +2,6 @@
 
 namespace TreatEmail;
 
-use App\Service\TostHttpClient;
 use Nyholm\Psr7\Request;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
