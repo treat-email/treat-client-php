@@ -36,16 +36,22 @@ final class ValidationResult
     /**
      * @param ResponseInterface $response
      *
-     * @return mixed
+     * @return string
      *
      * @throws \JsonException
      */
-    public function getMessage(ResponseInterface $response)
+    public function getMessage(ResponseInterface $response): string
     {
+        $this->checkResponseCode($response);
+
         $json = $response->getBody()->getContents();
         $validationResult = \json_decode($json, true);
         if (\json_last_error() !== JSON_ERROR_NONE) {
             throw new \JsonException('Invalid format');
+        }
+
+        if (isset($validationResult['message']) === false) {
+            return '';
         }
 
         return $validationResult['message'];
