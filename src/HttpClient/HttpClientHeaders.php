@@ -11,7 +11,7 @@ final class HttpClientHeaders
     const OPTIONS_KEY = 'headers';
     const REQUEST_HEADERS = [
         'Content-Type: application/json',
-        'User-Agent: treat-client-php:v1.0.3',
+        'User-Agent: treat-client-php:v1.0.5',
     ];
 
     /**
