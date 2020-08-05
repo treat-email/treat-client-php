@@ -8,7 +8,7 @@ use TreatEmail\Exception\InvalidHeaderOptionsTypeException;
 
 final class NativeHttpClient implements HttpClientInterface
 {
-    const API_URL_TEMPLATE = 'http://10.211.55.4/validate/%s/%s';
+    const API_URL_TEMPLATE = 'http://api.treat.email/validate/%s/%s';
 
     /**
      * @var HttpClientHeaders
