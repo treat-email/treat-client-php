@@ -2,7 +2,7 @@
 ## Versions
 `treat-client-php` uses a modified version of [Semantic Versioning](https://semver.org) for all changes.
 ### Supported PHP Versions
-* PHP >= 7.1
+* PHP >= 7.0
 ## Installation
 You can install **treat-client-php** via composer or by downloading the source.
 
@@ -22,23 +22,22 @@ Send request with HTTPlug or any other PSR-18 (HTTP client) you may send request
 $clientKey = 'XXXXX';
 $clientSecret = 'XXXXX';
 $email = 'admin@treat.email';
-$psr18Client = new Psr18Client();
 
-$client = new \TreatEmail\Client($psr18Client, $clientKey, $clientSecret);
-$validationResult = new \TreatEmail\ValidationResult();
+$httpClient = new \TreatEmail\HttpClient\NativeHttpClient(new \TreatEmail\HttpClient\HttpClientHeaders());
+$api = new TreatEmail\ApiClient\ApiClient($httpClient, $clientKey, $clientSecret);
+$apiDecorator = new \TreatEmail\ApiClient\ApiClientDecorator($api);
+$validationResult = $apiDecorator->validate($email);
+
 try {
-    $response = $client->validate($email);
-    if ($validationResult->isRegistrable($response) === true) {
+    if ($validationResult->isRegistrable() === true) {
         // email is registrable
     }
-    if ($validationResult->isRegistrable($response) === false) {
+    if ($validationResult->isRegistrable() === false) {
         // email is not registrable
         // and you can get violation message
-        $violation = $validationResult->getMessage($response);
+        $violation = $validationResult->getMessage();
     }
-} catch (\TreatEmail\Exception\Maintenance $exception) {
-    // handle exception if server on maintenance
-} catch (\TreatEmail\HttpResponseNotOk $exception) {
+} catch (\TreatEmail\Exception\RequestFailedException $exception) {
     // faced issue with internet connection or server error
     // in this case use fallback internal validation to check an email
 }
@@ -46,6 +45,6 @@ try {
 
 #### List of violation messages:
 * Invalid format
-* Domain does not exists
+* Domain does not exist
 * Disposable domain
-* Invalid top level domain
+* Invalid top-level domain
